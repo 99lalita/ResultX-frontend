@@ -1,24 +1,14 @@
-import {
-  Box,
-  Button,
-  Container,
-  Grid,
-  IconButton,
-  InputAdornment,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, Stack, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Checkbox from "@mui/material/Checkbox";
-import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
 import { Link, NavLink } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Bounce } from "react-toastify";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState();
@@ -26,19 +16,34 @@ const AdminLogin = () => {
   const [prn, setPrn] = useState();
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [checked, setChecked] = React.useState(true);
+  const [checked, setChecked] = useState(true);
 
+  const handleClick = () => {
+    setShow(!show);
+  };
   const handleChange1 = (event) => {
     setChecked(event.target.checked);
     console.log(checked);
   };
-  const handleClick = () => {
-    setShow(!show);
+  const commonToastOptions = {
+    position: "bottom-left",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    transition: Bounce,
   };
-
   const submitHandler = async () => {
     setLoading(true);
-    if (!email || !password) {
+    if (!email || !password || !prn) {
+      toast.warn("Please fill all the fields!", {
+        ...commonToastOptions,
+      });
+      setLoading(false);
+      return;
     }
   };
 
@@ -81,7 +86,6 @@ const AdminLogin = () => {
         onChange={(e) => {
           setPassword(e.target.value);
         }}
-        onClick={submitHandler}
         fullWidth
         required
         InputProps={{
@@ -111,7 +115,12 @@ const AdminLogin = () => {
         />
       </FormControl>
 
-      <Button variant="contained" width="100%" style={{ marginTop: "15px" }}>
+      <Button
+        variant="contained"
+        width="100%"
+        onClick={submitHandler}
+        style={{ marginTop: "15px" }}
+      >
         Login
       </Button>
 
@@ -139,6 +148,7 @@ const AdminLogin = () => {
           Signup
         </NavLink>
       </p>
+      <ToastContainer />
     </Stack>
   );
 };

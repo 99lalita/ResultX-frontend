@@ -5,45 +5,76 @@ import {
   Stack,
   TextField,
   Typography,
-  Snackbar,
 } from "@mui/material";
 import React, { useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Bounce } from "react-toastify";
 
 const StudentRegistration = () => {
-  const [name, setName] = useState();
   const [email, setEmail] = useState();
   const [confirmpassword, setConfirmpassword] = useState();
   const [password, setPassword] = useState();
   const [prn, setPrn] = useState();
   const [pic, setPic] = useState();
   const [show, setShow] = useState(false);
-  const [loading, setLoading] = useState();
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [picLoading, setPicLoading] = useState(false);
 
   const handleClick = () => {
     setShow(!show);
   };
-
-  const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
+  const commonToastOptions = {
+    position: "bottom-left",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    transition: Bounce,
   };
   const postDetails = async (pics) => {
+    setPicLoading(true);
+    console.log(pic);
+    if (pic === undefined) {
+      toast.warn("Please Select an Image!", {
+        ...commonToastOptions,
+      });
+      return;
+    }
+    console.log(pics);
     if (pics.type === "image/jpeg" || pics.type === "image/png") {
-      setPic(pics);
-      setSnackbarOpen(true);
+      //code
     } else {
-      setSnackbarOpen(true);
+      toast.warn("Please Select an Image!", {
+        ...commonToastOptions,
+      });
+      setPicLoading(false);
+      return;
     }
   };
 
   const submitHandler = async () => {
-    if (!pic) {
-      setSnackbarOpen(true);
-    } else {
+    // console.log("asdfsd");
+    setPicLoading(true);
+    if (!email || !password || !confirmpassword || !prn) {
+      toast.warn("Please Fill all the Feilds", {
+        ...commonToastOptions,
+      });
+      setPicLoading(false);
+      return;
     }
+    if (password !== confirmpassword) {
+      toast.warn("Passwords Do Not Match", {
+        ...commonToastOptions,
+      });
+      return;
+    }
+    console.log(email, password, pic);
   };
 
   return (
@@ -171,26 +202,7 @@ const StudentRegistration = () => {
         >
           Sign Up
         </Button>
-
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-          message={
-            pic
-              ? "Image selected successfully!"
-              : "Please select an image file."
-          }
-          action={
-            <Button
-              color="secondary"
-              size="small"
-              onClick={handleCloseSnackbar}
-            >
-              Close
-            </Button>
-          }
-        />
+        <ToastContainer />
       </Stack>
     </>
   );

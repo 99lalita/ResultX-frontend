@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Link, NavLink } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Bounce } from "react-toastify";
 
 const StudentLogin = () => {
-  const [name, setName] = useState();
   const [email, setEmail] = useState();
   const [prn, setPrn] = useState();
   const [password, setPassword] = useState();
@@ -15,10 +17,25 @@ const StudentLogin = () => {
   const handleClick = () => {
     setShow(!show);
   };
-
+  const commonToastOptions = {
+    position: "bottom-left",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    transition: Bounce,
+  };
   const submitHandler = async () => {
     setLoading(true);
-    if (!email || !password) {
+    if (!email || !password || !prn) {
+      toast.warn("Please fill all the fields!", {
+        ...commonToastOptions,
+      });
+      setLoading(false);
+      return;
     }
   };
 
@@ -62,7 +79,6 @@ const StudentLogin = () => {
         onChange={(e) => {
           setPassword(e.target.value);
         }}
-        onClick={submitHandler}
         fullWidth
         required
         InputProps={{
@@ -84,7 +100,12 @@ const StudentLogin = () => {
         }}
       />
 
-      <Button variant="contained" width="100%" style={{ marginTop: 25 }}>
+      <Button
+        variant="contained"
+        width="100%"
+        onClick={submitHandler}
+        style={{ marginTop: 25 }}
+      >
         Login
       </Button>
       <Typography>
@@ -99,6 +120,7 @@ const StudentLogin = () => {
           Signup
         </NavLink>
       </p>
+      <ToastContainer />
     </Stack>
   );
 };
