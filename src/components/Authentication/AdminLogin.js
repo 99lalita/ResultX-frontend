@@ -2,28 +2,22 @@ import { Button, Stack, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
 import { Link, NavLink } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Bounce } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  const [prn, setPrn] = useState();
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [checked, setChecked] = useState(true);
+  let navigate = useNavigate();
 
   const handleClick = () => {
     setShow(!show);
-  };
-  const handleChange1 = (event) => {
-    setChecked(event.target.checked);
-    console.log(checked);
   };
   const commonToastOptions = {
     position: "bottom-left",
@@ -38,30 +32,52 @@ const AdminLogin = () => {
   };
   const submitHandler = async () => {
     setLoading(true);
-    if (!email || !password || !prn) {
+    if (!email || !password) {
       toast.warn("Please fill all the fields!", {
         ...commonToastOptions,
       });
       setLoading(false);
       return;
     }
+    if (!email.endsWith("@gmail.com")) {
+      toast.error("Please enter a valid Gmail address", {
+        ...commonToastOptions,
+      });
+      return;
+    }
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+
+      const { data } = await axios.post(
+        "/api/v1/auth/admin/login",
+        { email, password },
+        config
+      );
+      // Extract the tokens from the response data
+      const { loginAuthToken, refreshAuthToken } = data;
+
+      // Set the tokens in cookies
+      document.cookie = `loginAuthToken=${loginAuthToken}; path=/`;
+      document.cookie = `refreshAuthToken=${refreshAuthToken}; path=/`;
+      navigate("/aboutpage");
+      toast.success("Login Successfull!", {
+        ...commonToastOptions,
+      });
+      setLoading(false);
+    } catch (error) {
+      toast.error("Error Occured!", {
+        ...commonToastOptions,
+      });
+      setLoading(false);
+    }
   };
 
   return (
     <Stack>
-      <TextField
-        id="standard-basic"
-        label="PRN No"
-        variant="standard"
-        placeholder="Enter Your PRN Number"
-        value={prn}
-        onChange={(e) => {
-          setPrn(e.target.value);
-        }}
-        style={{ marginTop: 15 }}
-        fullWidth
-        required
-      />
       <TextField
         id="standard-basic"
         label="Email"
@@ -106,20 +122,12 @@ const AdminLogin = () => {
           ),
         }}
       />
-      <FormControl component="fieldset">
-        <FormControlLabel
-          value="end"
-          control={<Checkbox onChange={handleChange1} />}
-          label="Remember Me"
-          labelPlacement="end"
-        />
-      </FormControl>
 
       <Button
         variant="contained"
         width="100%"
         onClick={submitHandler}
-        style={{ marginTop: "15px" }}
+        style={{ marginTop: "25px" }}
       >
         Login
       </Button>

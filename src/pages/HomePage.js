@@ -38,12 +38,18 @@ const HomePage = () => {
     width: "30%",
     // margin: "10px auto",
     borderRadius: "10px",
-    display: { xs: "block", md: "none", lg: "block" },
+    // display: { xs: "block", md: "none", lg: "block" },
+    marginTop: 50,
+    position: "absolute",
+    top: "50%",
+    left: "80%",
+    transform: "translate(-50%, -50%)",
+    zIndex: 1,
   };
 
   return (
     <Stack alignItems="center" maxW="md">
-      <Paper
+      {/* <Paper
         elevation={3}
         style={{
           height: "40px",
@@ -57,14 +63,23 @@ const HomePage = () => {
           background: "white",
         }}
       >
-        {/* <Box> */}
         <Typography variant="h4" fontFamily="Work sans" fontSize="2.25rem">
           APPLICATION
         </Typography>
-        {/* </Box> */}
-      </Paper>
-      {/* <Box> */}
-      <Paper elevation={3} style={paperStyle}>
+      </Paper> */}
+      <Box
+        sx={{
+          position: "relative",
+          marginTop: "5%",
+          // transform: "translate(-50%, -50%)",
+          width: "80%",
+          maxWidth: "400px",
+          height: "auto",
+          zIndex: 1,
+          height: "3em",
+        }}
+      >
+        {/* <Paper elevation={3} style={paperStyle}> */}
         <Tabs
           value={value}
           onChange={handleChange}
@@ -80,8 +95,8 @@ const HomePage = () => {
         <TabPanel value={value} index={1} dir={theme.direction}>
           <AdminLogin />
         </TabPanel>
-      </Paper>
-      {/* </Box> */}
+        {/* </Paper> */}
+      </Box>
     </Stack>
   );
 };

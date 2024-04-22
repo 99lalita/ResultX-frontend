@@ -1,11 +1,15 @@
 import {
   Avatar,
   Button,
+  CircularProgress,
   Input,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 import React, { useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -13,19 +17,32 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Bounce } from "react-toastify";
+import { Checkbox, FormControlLabel } from "@mui/material";
+import axios from "axios";
 
-const StudentRegistration = () => {
+const AdminRegistration = () => {
+  const [first_name, setFirstName] = useState();
+  const [last_name, setLastName] = useState();
   const [email, setEmail] = useState();
   const [confirmpassword, setConfirmpassword] = useState();
-  const [password, setPassword] = useState();
-  const [prn, setPrn] = useState();
-  const [pic, setPic] = useState();
+  const [account_password, setAccountPassword] = useState();
+  const [enrollment_id, setEnrollmentId] = useState();
+  const [profileImageURI, setProfileImageURI] = useState();
   const [show, setShow] = useState(false);
   const [picLoading, setPicLoading] = useState(false);
+  const [current_year, setCurrentyear] = useState("");
+  const [admission_year, setAdmission_year] = useState("");
+  const [graduation_year, setGraduation_year] = useState("");
+  const [isDSY, setIsDSY] = useState(false);
+
+  const handleCheckboxChange = (event) => {
+    setIsDSY(event.target.checked);
+  };
 
   const handleClick = () => {
     setShow(!show);
   };
+
   const commonToastOptions = {
     position: "bottom-left",
     autoClose: 5000,
@@ -37,18 +54,29 @@ const StudentRegistration = () => {
     theme: "light",
     transition: Bounce,
   };
+
   const postDetails = async (pics) => {
     setPicLoading(true);
-    console.log(pic);
-    if (pic === undefined) {
-      toast.warn("Please Select an Image!", {
-        ...commonToastOptions,
-      });
-      return;
-    }
     console.log(pics);
     if (pics.type === "image/jpeg" || pics.type === "image/png") {
-      //code
+      const data = new FormData();
+      data.append("file", pics);
+      data.append("upload_preset", "chat-app");
+      data.append("cloud_name", "dcr0wpqcw");
+      fetch("https://api.cloudinary.com/v1_1/dcr0wpqcw/image/upload", {
+        method: "post",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setProfileImageURI(data.url.toString());
+          console.log(data.url.toString());
+          setPicLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setPicLoading(false);
+        });
     } else {
       toast.warn("Please Select an Image!", {
         ...commonToastOptions,
@@ -59,40 +87,141 @@ const StudentRegistration = () => {
   };
 
   const submitHandler = async () => {
-    // console.log("asdfsd");
     setPicLoading(true);
-    if (!email || !password || !confirmpassword || !prn) {
+    if (
+      !email ||
+      !account_password ||
+      !confirmpassword ||
+      !enrollment_id ||
+      !first_name ||
+      !last_name ||
+      !profileImageURI ||
+      !current_year ||
+      !admission_year ||
+      !graduation_year
+    ) {
       toast.warn("Please Fill all the Feilds", {
         ...commonToastOptions,
       });
       setPicLoading(false);
       return;
     }
-    if (password !== confirmpassword) {
+    if (!email.endsWith("@gmail.com")) {
+      toast.error("Please enter a valid Gmail address", {
+        ...commonToastOptions,
+      });
+      return;
+    }
+    if (account_password !== confirmpassword) {
       toast.warn("Passwords Do Not Match", {
         ...commonToastOptions,
       });
       return;
     }
-    console.log(email, password, pic);
+    console.log(email, account_password, profileImageURI);
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        "/api/v1/auth/student/signup",
+        {
+          enrollment_id,
+          first_name,
+          last_name,
+          email,
+          admission_year,
+          current_year,
+          account_password,
+          graduation_year,
+          isDSY,
+          profileImageURI,
+        },
+        config
+      );
+      console.log(data);
+      toast.success("Registration Successful", {
+        ...commonToastOptions,
+      });
+      // localStorage.setItem("userInfo", JSON.stringify(data));
+      setPicLoading(false);
+      // history.push("/chats");
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setPicLoading(false);
+    }
   };
+
+  function generateYearOptions() {
+    const current_year = new Date().getFullYear();
+    const maxYear = current_year + 4;
+    const minYear = 1995;
+    const yearOptions = [];
+
+    for (let year = maxYear; year >= minYear; year--) {
+      yearOptions.push(year.toString());
+    }
+
+    return yearOptions;
+  }
 
   return (
     <>
-      <Stack alignItems={"center"} padding={"10px"}>
-        <Avatar style={{ background: "#1bbd7e" }}>
-          <AddCircleOutlineIcon />
-        </Avatar>
-        <h2 style={{ fontFamily: "Work sans" }}>Student Sign Up</h2>
+      <Stack>
+        <Stack alignItems={"center"}>
+          <Avatar style={{ background: "#1bbd7e" }}>
+            <AddCircleOutlineIcon />
+          </Avatar>
+          <h2 style={{ fontFamily: "Work sans" }}>Student SignUp</h2>
+        </Stack>
 
         <TextField
           id="standard-basic"
           label="PRN No"
           variant="standard"
           placeholder="Enter Your PRN Number"
-          value={prn}
+          value={enrollment_id}
           onChange={(e) => {
-            setPrn(e.target.value);
+            const input = e.target.value;
+            if (/^\d{0,10}$/.test(input)) {
+              setEnrollmentId(input);
+            }
+          }}
+          inputProps={{ maxLength: 10 }} // Limit the maximum input length to 10 characters
+          style={{ marginTop: 0 }}
+          fullWidth
+          required
+        />
+        <TextField
+          id="standard-basic"
+          label="First Name"
+          variant="standard"
+          placeholder="Enter Your First Name"
+          value={first_name}
+          onChange={(e) => {
+            setFirstName(e.target.value);
+          }}
+          style={{ marginTop: 15 }}
+          fullWidth
+          required
+        />
+        <TextField
+          id="standard-basic"
+          label="Last Name"
+          variant="standard"
+          placeholder="Enter Your Last Name"
+          value={last_name}
+          onChange={(e) => {
+            setLastName(e.target.value);
           }}
           style={{ marginTop: 15 }}
           fullWidth
@@ -118,10 +247,10 @@ const StudentRegistration = () => {
           label="Password"
           placeholder="Enter password"
           type={show ? "text" : "password"}
-          value={password}
+          value={account_password}
           style={{ marginTop: 15 }}
           onChange={(e) => {
-            setPassword(e.target.value);
+            setAccountPassword(e.target.value);
           }}
           fullWidth
           required
@@ -175,12 +304,72 @@ const StudentRegistration = () => {
           }}
         />
 
-        {/* <Typography
-          variant="h8"
-          style={{ paddingLeft: 0, marginTop: 15, marginLeft: 0 }}
+        {/* Dropdown menu for Current Year */}
+        <FormControl
+          variant="standard"
+          style={{ marginTop: 15 }}
+          fullWidth
+          required
         >
-          Upload Your Picture
-        </Typography> */}
+          <InputLabel id="current-year-label">Current Year</InputLabel>
+          <Select
+            labelId="current-year-label"
+            id="current-year"
+            value={current_year}
+            onChange={(e) => setCurrentyear(e.target.value)}
+          >
+            {generateYearOptions().map((year) => (
+              <MenuItem key={year} value={year}>
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        {/* Dropdown menu for Admission Year */}
+        <FormControl
+          variant="standard"
+          style={{ marginTop: 15 }}
+          fullWidth
+          required
+        >
+          <InputLabel id="admission-year-label">Admission Year</InputLabel>
+          <Select
+            labelId="admission-year-label"
+            id="admission-year"
+            value={admission_year}
+            onChange={(e) => setAdmission_year(e.target.value)}
+          >
+            {generateYearOptions().map((year) => (
+              <MenuItem key={year} value={year}>
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        {/* Dropdown menu for Graduation Year */}
+        <FormControl
+          variant="standard"
+          style={{ marginTop: 15 }}
+          fullWidth
+          required
+        >
+          <InputLabel id="graduation-year-label">Graduation Year</InputLabel>
+          <Select
+            labelId="graduation-year-label"
+            id="graduation-year"
+            value={graduation_year}
+            onChange={(e) => setGraduation_year(e.target.value)}
+          >
+            {generateYearOptions().map((year) => (
+              <MenuItem key={year} value={year}>
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         <Input
           type="file"
           p={1.5}
@@ -194,13 +383,29 @@ const StudentRegistration = () => {
           required
         />
 
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={isDSY}
+              onChange={handleCheckboxChange}
+              color="primary"
+            />
+          }
+          label="Head of Department"
+        />
+
         <Button
           variant="contained"
           width="100%"
           style={{ marginTop: 15 }}
           onClick={submitHandler}
+          loading={picLoading}
         >
-          Sign Up
+          {picLoading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "Sign Up"
+          )}
         </Button>
         <ToastContainer />
       </Stack>
@@ -208,4 +413,4 @@ const StudentRegistration = () => {
   );
 };
 
-export default StudentRegistration;
+export default AdminRegistration;

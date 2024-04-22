@@ -1,4 +1,11 @@
-import { Avatar, Button, Input, Stack, TextField } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  CircularProgress,
+  Input,
+  Stack,
+  TextField,
+} from "@mui/material";
 import React, { useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -6,18 +13,26 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Bounce } from "react-toastify";
+import axios from "axios";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 const AdminRegistration = () => {
+  const [first_name, setFirstName] = useState();
+  const [last_name, setLastName] = useState();
   const [email, setEmail] = useState();
   const [confirmpassword, setConfirmpassword] = useState();
-  const [password, setPassword] = useState();
-  const [prn, setPrn] = useState();
-  const [pic, setPic] = useState();
+  const [account_password, setAccountPassword] = useState();
+  const [admin_id, setAdminId] = useState();
+  const [profileImageURI, setProfileImageURI] = useState();
   const [show, setShow] = useState(false);
   const [picLoading, setPicLoading] = useState(false);
+  const [isHOD, setisHOD] = useState(false);
 
   const handleClick = () => {
     setShow(!show);
+  };
+  const handleCheckboxChange = (event) => {
+    setisHOD(event.target.checked);
   };
 
   const commonToastOptions = {
@@ -31,18 +46,29 @@ const AdminRegistration = () => {
     theme: "light",
     transition: Bounce,
   };
+
   const postDetails = async (pics) => {
     setPicLoading(true);
-    console.log(pic);
-    if (pic === undefined) {
-      toast.warn("Please Select an Image!", {
-        ...commonToastOptions,
-      });
-      return;
-    }
     console.log(pics);
     if (pics.type === "image/jpeg" || pics.type === "image/png") {
-      //code
+      const data = new FormData();
+      data.append("file", pics);
+      data.append("upload_preset", "chat-app");
+      data.append("cloud_name", "dcr0wpqcw");
+      fetch("https://api.cloudinary.com/v1_1/dcr0wpqcw/image/upload", {
+        method: "post",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setProfileImageURI(data.url.toString());
+          console.log(data.url.toString());
+          setPicLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setPicLoading(false);
+        });
     } else {
       toast.warn("Please Select an Image!", {
         ...commonToastOptions,
@@ -54,20 +80,65 @@ const AdminRegistration = () => {
 
   const submitHandler = async () => {
     setPicLoading(true);
-    if (!email || !password || !confirmpassword || !prn) {
+    if (
+      !email ||
+      !account_password ||
+      !confirmpassword ||
+      !admin_id ||
+      !first_name ||
+      !last_name ||
+      !profileImageURI
+    ) {
       toast.warn("Please Fill all the Feilds", {
         ...commonToastOptions,
       });
       setPicLoading(false);
       return;
     }
-    if (password !== confirmpassword) {
+    if (account_password !== confirmpassword) {
       toast.warn("Passwords Do Not Match", {
         ...commonToastOptions,
       });
       return;
     }
-    console.log(email, password, pic);
+    if (!email.endsWith("@gmail.com")) {
+      toast.error("Please enter a valid Gmail address", {
+        ...commonToastOptions,
+      });
+      return;
+    }
+    console.log(email, account_password, profileImageURI);
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        "/api/v1/auth/admin/signup",
+        {
+          admin_id,
+          first_name,
+          last_name,
+          account_password,
+          email,
+          profileImageURI,
+          isHOD,
+        },
+        config
+      );
+      console.log(data);
+      toast.warn("Registration Successful", {
+        ...commonToastOptions,
+      });
+      setPicLoading(false);
+      // history.push("/chats");
+    } catch (error) {
+      toast.warn("Error Occured!", {
+        ...commonToastOptions,
+      });
+      setPicLoading(false);
+    }
   };
 
   return (
@@ -85,9 +156,40 @@ const AdminRegistration = () => {
           label="PRN No"
           variant="standard"
           placeholder="Enter Your PRN Number"
-          value={prn}
+          value={admin_id}
           onChange={(e) => {
-            setPrn(e.target.value);
+            const input = e.target.value;
+            if (/^\d{0,10}$/.test(input)) {
+              // Check if the input contains only digits and is at most 10 characters long
+              setAdminId(input);
+            }
+          }}
+          inputProps={{ maxLength: 10 }} // Limit the maximum input length to 10 characters
+          style={{ marginTop: 0 }}
+          fullWidth
+          required
+        />
+        <TextField
+          id="standard-basic"
+          label="First Name"
+          variant="standard"
+          placeholder="Enter Your First Name"
+          value={first_name}
+          onChange={(e) => {
+            setFirstName(e.target.value);
+          }}
+          style={{ marginTop: 15 }}
+          fullWidth
+          required
+        />
+        <TextField
+          id="standard-basic"
+          label="Last Name"
+          variant="standard"
+          placeholder="Enter Your Last Name"
+          value={last_name}
+          onChange={(e) => {
+            setLastName(e.target.value);
           }}
           style={{ marginTop: 15 }}
           fullWidth
@@ -113,10 +215,10 @@ const AdminRegistration = () => {
           label="Password"
           placeholder="Enter password"
           type={show ? "text" : "password"}
-          value={password}
+          value={account_password}
           style={{ marginTop: 15 }}
           onChange={(e) => {
-            setPassword(e.target.value);
+            setAccountPassword(e.target.value);
           }}
           fullWidth
           required
@@ -188,6 +290,16 @@ const AdminRegistration = () => {
           fullWidth
           required
         />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={isHOD}
+              onChange={handleCheckboxChange}
+              color="primary"
+            />
+          }
+          label="Head of Department"
+        />
 
         <Button
           variant="contained"
@@ -195,7 +307,11 @@ const AdminRegistration = () => {
           style={{ marginTop: 15 }}
           onClick={submitHandler}
         >
-          Sign Up
+          {picLoading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "SignUp"
+          )}
         </Button>
         <ToastContainer />
       </Stack>

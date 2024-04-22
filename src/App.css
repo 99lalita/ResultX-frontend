@@ -1,13 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap");
-
-/* .App {
+body {
+  margin: 0;
+}
+.App {
   min-height: 100vh;
   /* display: flex; */
-/* background-image: url("./back.avif"); */
-/* background-size: cover;
-  background-position: center;
-  color: "black";
-} */
+  /* background-image: url("./img.jpeg"); */
+  /* background-image: url("./back.avif"); */
+  background-size: cover;
+  background-color: #d4e7c5;
+
+  margin: 0;
+}
 
 /* .App {
   background-image: url("./back.avif");
