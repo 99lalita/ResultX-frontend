@@ -40,6 +40,7 @@ const ViewResultPage = () => {
       toast.warning("PDF is Unable to Fetch!");
     }
     analyzeResults(previousResult);
+    // eslint-disable-next-line
   }, [result]);
 
   const handlePDFClick = () => {

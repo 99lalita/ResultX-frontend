@@ -203,11 +203,9 @@ import {
 import * as XLSX from "xlsx";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Bar } from "react-chartjs-2";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import SchoolIcon from "@mui/icons-material/School";
-import InsertChartIcon from "@mui/icons-material/InsertChart";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -265,43 +263,43 @@ const FourthYearResultFormat = ({ resultData, resultYear, batchYear }) => {
     }
   };
 
-  const chartData = {
-    labels: ["With Backlog", "Without Backlog", "Total Students"],
-    datasets: [
-      {
-        label: "Number of Students",
-        data: [
-          resultData.data.numberOfStudents.withBacklog,
-          resultData.data.numberOfStudents.withoutBacklog,
-          resultData.data.numberOfStudents.totalStudents,
-        ],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(54, 162, 235, 1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
+  // const chartData = {
+  //   labels: ["With Backlog", "Without Backlog", "Total Students"],
+  //   datasets: [
+  //     {
+  //       label: "Number of Students",
+  //       data: [
+  //         resultData.data.numberOfStudents.withBacklog,
+  //         resultData.data.numberOfStudents.withoutBacklog,
+  //         resultData.data.numberOfStudents.totalStudents,
+  //       ],
+  //       backgroundColor: [
+  //         "rgba(255, 99, 132, 0.2)",
+  //         "rgba(75, 192, 192, 0.2)",
+  //         "rgba(54, 162, 235, 0.2)",
+  //       ],
+  //       borderColor: [
+  //         "rgba(255, 99, 132, 1)",
+  //         "rgba(75, 192, 192, 1)",
+  //         "rgba(54, 162, 235, 1)",
+  //       ],
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
 
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        text: "Student Distribution for Fourth Year",
-      },
-    },
-  };
+  // const chartOptions = {
+  //   responsive: true,
+  //   plugins: {
+  //     legend: {
+  //       position: "top",
+  //     },
+  //     title: {
+  //       display: true,
+  //       text: "Student Distribution for Fourth Year",
+  //     },
+  //   },
+  // };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, transition: "all linear 0.4s" }}>

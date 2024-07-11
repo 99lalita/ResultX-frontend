@@ -20,7 +20,7 @@ import ProfileModal from "./ProfileModal";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import BackendEndpoints from "../../utils/BackendEndpoints";
-import InfoIcon from "@mui/icons-material/Info";
+
 
 const MainNavbar = ({ userType, userData }) => {
   const { theme, toggleTheme } = useTheme();

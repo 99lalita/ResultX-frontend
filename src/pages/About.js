@@ -17,7 +17,7 @@ const variants = {
 const About = () => {
   const ref = useRef();
   const isInView = useInView(ref, { threshold: 0.5 });
-  const { theme, toggleTheme, student, userType, admin } = useTheme();
+  const { theme, student, userType, admin } = useTheme();
 
   return (
     <div

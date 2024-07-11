@@ -42,8 +42,8 @@ const Contact = () => {
   const { theme, userType, student, admin } = useTheme();
   //   console.log(theme);
 
-  const [error, setError] = useState(false);
-  const [success, setSuccess] = useState(false);
+  // const [error, setError] = useState(false);
+  // const [success, setSuccess] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -72,7 +72,7 @@ const Contact = () => {
       )
       .then(
         (result) => {
-          setSuccess(true);
+          // setSuccess(true);
           notifySuccess();
           console.log(result.text);
           setName("");
@@ -81,8 +81,8 @@ const Contact = () => {
           setFormSubmitted(true);
         },
         (error) => {
-          setError(true);
-          notifyFailure(); // Show failure toast
+          // setError(true);
+          notifyFailure();
           console.log(error.text);
         }
       );
@@ -327,7 +327,6 @@ const Contact = () => {
                 alignSelf: "center",
                 fontWeight: 500,
                 fontFamily: "Work Sans",
-                fontWeight: "bolder",
               }}
               variants={variants}
             >

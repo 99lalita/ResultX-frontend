@@ -1,12 +1,9 @@
-import { Paper, Grid, Typography, Button } from "@mui/material";
+import { Grid, Typography, Button } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
-import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CheckIcon from "@mui/icons-material/Check";
 import { useTheme } from "../../context/ThemeContext";
-import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 
 const InsightComponent = ({ insights }) => {
   const { theme, student } = useTheme();
@@ -22,7 +19,6 @@ const InsightComponent = ({ insights }) => {
             textAlign: "center",
             fontWeight: "700",
             marginBottom: "20px",
-            transition: "all linear 0.3s",
           }}
           className="view-result-heading"
         >

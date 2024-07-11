@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, Grid, Paper, Stack, Typography, Tab, Tabs } from "@mui/material";
+import React from "react";
+import { Box, Stack } from "@mui/material";
 import AdminRegistration from "../components/Authentication/AdminRegistration";
 import StudentRegistration from "../components/Authentication/StudentRegistration";
 import { Route, Routes } from "react-router-dom";

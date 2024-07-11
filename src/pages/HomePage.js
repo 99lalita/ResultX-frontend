@@ -58,7 +58,7 @@ export default function FullWidthTabs() {
           fontWeight: 900,
           color: "#527853",
           textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
-          fontWeight: "bold",
+
           paddingTop: "100px",
         }}
       >
@@ -68,13 +68,12 @@ export default function FullWidthTabs() {
         <Box
           sx={{
             bgcolor: "background.paper",
-            width: 500,
+
             borderRadius: "5px",
             position: "relative",
             marginTop: "1%",
             width: "80%",
             maxWidth: "400px",
-            height: "auto",
             zIndex: 1,
             height: "3em",
           }}

@@ -254,7 +254,6 @@ const TeamPage = () => {
                     sx={{
                       textAlign: "center",
                       fontWeight: "500",
-                      color: "black",
                       fontSize: "20px",
                       fontFamily: "Work Sans",
                       color: theme === "dark" ? "#fff" : "black",
@@ -355,7 +354,6 @@ const TeamPage = () => {
                     sx={{
                       textAlign: "center",
                       fontWeight: "500",
-                      color: "black",
                       fontSize: "20px",
                       fontFamily: "Work Sans",
                       color: theme === "dark" ? "#fff" : "black",
@@ -421,7 +419,6 @@ const TeamPage = () => {
                     sx={{
                       textAlign: "center",
                       fontWeight: "500",
-                      color: "black",
                       fontSize: "20px",
                       fontFamily: "Work Sans",
                       color: theme === "dark" ? "#fff" : "black",

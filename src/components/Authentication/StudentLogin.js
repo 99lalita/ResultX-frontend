@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Link, NavLink } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -27,11 +27,6 @@ const StudentLogin = () => {
     setShow(!show);
   };
 
-  // setting up the tokens
-  const [tokens, setTokens] = useState({
-    accessToken: Cookies.get(BackendEndpoints.AUTH_STUDENT_ACCESS_TOKEN),
-    refreshToken: Cookies.get(BackendEndpoints.AUTH_STUDENT_REFRESH_TOKEN),
-  });
 
   const submitHandler = async () => {
     setLoading(true);

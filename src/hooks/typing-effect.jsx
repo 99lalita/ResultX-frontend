@@ -24,7 +24,7 @@ export function useTypingEffect(textToType, interKeyStrokeDurationInMs) {
       currentPositionRef.current = 0;
       setCurrentPosition(0);
     };
-  }, [interKeyStrokeDurationInMs]);
+  }, [interKeyStrokeDurationInMs,textToType]);
 
   return textToType.substring(0, currentPosition);
 }
