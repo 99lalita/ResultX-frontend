@@ -14,13 +14,17 @@ import React, { useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Bounce } from "react-toastify";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import BackendEndpoints from "../../utils/BackendEndpoints";
 
-const AdminRegistration = () => {
+
+const StudentRegistration = () => {
   const [first_name, setFirstName] = useState();
   const [last_name, setLastName] = useState();
   const [email, setEmail] = useState();
@@ -30,10 +34,11 @@ const AdminRegistration = () => {
   const [profileImageURI, setProfileImageURI] = useState();
   const [show, setShow] = useState(false);
   const [picLoading, setPicLoading] = useState(false);
-  const [current_year, setCurrentyear] = useState("");
+  const [current_year, setCurrentyear] = useState();
   const [admission_year, setAdmission_year] = useState("");
   const [graduation_year, setGraduation_year] = useState("");
   const [isDSY, setIsDSY] = useState(false);
+  let navigate = useNavigate();
 
   const handleCheckboxChange = (event) => {
     setIsDSY(event.target.checked);
@@ -44,7 +49,7 @@ const AdminRegistration = () => {
   };
 
   const commonToastOptions = {
-    position: "bottom-left",
+    position: "top-right",
     autoClose: 5000,
     hideProgressBar: false,
     closeOnClick: true,
@@ -106,10 +111,13 @@ const AdminRegistration = () => {
       setPicLoading(false);
       return;
     }
-    if (!email.endsWith("@gmail.com")) {
-      toast.error("Please enter a valid Gmail address", {
-        ...commonToastOptions,
-      });
+    const year = parseInt(admission_year);
+    setGraduation_year(year + 4);
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailPattern.test(email)) {
+      toast.error("Please enter a valid email address");
+
       return;
     }
     if (account_password !== confirmpassword) {
@@ -118,7 +126,7 @@ const AdminRegistration = () => {
       });
       return;
     }
-    console.log(email, account_password, profileImageURI);
+    // console.log(email, account_password, profileImageURI);
     try {
       const config = {
         headers: {
@@ -126,7 +134,7 @@ const AdminRegistration = () => {
         },
       };
       const { data } = await axios.post(
-        "/api/v1/auth/student/signup",
+        BackendEndpoints.REACT_APP_STUDENT_REGISTRATION_API,
         {
           enrollment_id,
           first_name,
@@ -141,13 +149,34 @@ const AdminRegistration = () => {
         },
         config
       );
-      console.log(data);
-      toast.success("Registration Successful", {
-        ...commonToastOptions,
-      });
-      // localStorage.setItem("userInfo", JSON.stringify(data));
-      setPicLoading(false);
-      // history.push("/chats");
+
+      if (data.status === 401) {
+        toast.error("Signup Failed ! User already exists", {
+          ...commonToastOptions,
+        });
+        setPicLoading(false);
+        navigate("/");
+      }
+      if (data.status === 201) {
+        console.log(data);
+        toast.success("Registration Successful", {
+          ...commonToastOptions,
+        });
+
+        // setting up the data
+        Cookies.set("studentInfo", JSON.stringify(data.user));
+        Cookies.set(
+          BackendEndpoints.AUTH_STUDENT_ACCESS_TOKEN,
+          data.loginAuthToken
+        );
+        Cookies.set(
+          BackendEndpoints.AUTH_STUDENT_REFRESH_TOKEN,
+          data.refreshAuthToken
+        );
+
+        setPicLoading(false);
+        navigate(`/student/${data.user.enrollment_id}`);
+      }
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -158,13 +187,14 @@ const AdminRegistration = () => {
         position: "bottom",
       });
       setPicLoading(false);
+      navigate("/");
     }
   };
 
   function generateYearOptions() {
     const current_year = new Date().getFullYear();
     const maxYear = current_year + 4;
-    const minYear = 1995;
+    const minYear = 2020;
     const yearOptions = [];
 
     for (let year = maxYear; year >= minYear; year--) {
@@ -208,7 +238,8 @@ const AdminRegistration = () => {
           placeholder="Enter Your First Name"
           value={first_name}
           onChange={(e) => {
-            setFirstName(e.target.value);
+            const input = e.target.value.replace(/[^A-Za-z]/gi, "");
+            setFirstName(input);
           }}
           style={{ marginTop: 15 }}
           fullWidth
@@ -221,7 +252,8 @@ const AdminRegistration = () => {
           placeholder="Enter Your Last Name"
           value={last_name}
           onChange={(e) => {
-            setLastName(e.target.value);
+            const input = e.target.value.replace(/[^A-Za-z]/gi, "");
+            setLastName(input);
           }}
           style={{ marginTop: 15 }}
           fullWidth
@@ -304,28 +336,6 @@ const AdminRegistration = () => {
           }}
         />
 
-        {/* Dropdown menu for Current Year */}
-        <FormControl
-          variant="standard"
-          style={{ marginTop: 15 }}
-          fullWidth
-          required
-        >
-          <InputLabel id="current-year-label">Current Year</InputLabel>
-          <Select
-            labelId="current-year-label"
-            id="current-year"
-            value={current_year}
-            onChange={(e) => setCurrentyear(e.target.value)}
-          >
-            {generateYearOptions().map((year) => (
-              <MenuItem key={year} value={year}>
-                {year}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
         {/* Dropdown menu for Admission Year */}
         <FormControl
           variant="standard"
@@ -348,7 +358,6 @@ const AdminRegistration = () => {
           </Select>
         </FormControl>
 
-        {/* Dropdown menu for Graduation Year */}
         <FormControl
           variant="standard"
           style={{ marginTop: 15 }}
@@ -369,6 +378,59 @@ const AdminRegistration = () => {
             ))}
           </Select>
         </FormControl>
+
+        {/* Dropdown menu for Current Year */}
+        <FormControl
+          variant="standard"
+          style={{ marginTop: 15 }}
+          fullWidth
+          required
+        >
+          <InputLabel id="current-year-label">
+            Enter Your Current Year
+          </InputLabel>
+          <Select
+            labelId="current-year-label"
+            id="current-year"
+            value={current_year}
+            onChange={(e) => setCurrentyear(e.target.value)}
+          >
+            <MenuItem key={1} value={1}>
+              First Year
+            </MenuItem>
+            <MenuItem key={1} value={2}>
+              Second Year
+            </MenuItem>
+            <MenuItem key={1} value={3}>
+              Third Year
+            </MenuItem>
+            <MenuItem key={1} value={4}>
+              Fourth Year
+            </MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Dropdown menu for Graduation Year
+        <FormControl
+          variant="standard"
+          style={{ marginTop: 15 }}
+          fullWidth
+          required
+        >
+          <InputLabel id="graduation-year-label">Graduation Year</InputLabel>
+          <Select
+            labelId="graduation-year-label"
+            id="graduation-year"
+            value={graduation_year}
+            onChange={(e) => setGraduation_year(e.target.value)}
+          >
+            {generateYearOptions().map((year) => (
+              <MenuItem key={year} value={year}>
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl> */}
 
         <Input
           type="file"
@@ -391,7 +453,7 @@ const AdminRegistration = () => {
               color="primary"
             />
           }
-          label="Head of Department"
+          label="is DSY"
         />
 
         <Button
@@ -407,10 +469,10 @@ const AdminRegistration = () => {
             "Sign Up"
           )}
         </Button>
-        <ToastContainer />
+        {/* <ToastContainer /> */}
       </Stack>
     </>
   );
 };
 
-export default AdminRegistration;
+export default StudentRegistration;

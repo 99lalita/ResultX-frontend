@@ -1,104 +1,136 @@
 import React, { useState } from "react";
-import { Box, Grid, Paper, Stack, Typography, Tab, Tabs } from "@mui/material";
-import { useTheme } from "@emotion/react";
-import AdminLogin from "../components/Authentication/AdminLogin";
+import PropTypes from "prop-types";
+import SwipeableViews from "react-swipeable-views";
+import { useTheme } from "@mui/material/styles";
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
 import StudentLogin from "../components/Authentication/StudentLogin";
+import AdminLogin from "../components/Authentication/AdminLogin";
+import { Stack } from "@mui/material";
+import Typography from "@mui/material/Typography";
 
-const HomePage = () => {
-  const [value, setValue] = useState(0);
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+export default function FullWidthTabs() {
   const theme = useTheme();
+  const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`full-width-tabpanel-${index}`}
-        aria-labelledby={`full-width-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box sx={{ p: 3 }}>
-            <Typography>{children}</Typography>
-          </Box>
-        )}
-      </div>
-    );
-  }
-
-  const paperStyle = {
-    padding: 20,
-    height: "70vh",
-    width: "30%",
-    // margin: "10px auto",
-    borderRadius: "10px",
-    // display: { xs: "block", md: "none", lg: "block" },
-    marginTop: 50,
-    position: "absolute",
-    top: "50%",
-    left: "80%",
-    transform: "translate(-50%, -50%)",
-    zIndex: 1,
+  const handleChangeIndex = (index) => {
+    setValue(index);
   };
 
   return (
-    <Stack alignItems="center" maxW="md">
-      {/* <Paper
-        elevation={3}
+    <div className="HomePage">
+      <Typography
+        variant="h4"
+        noWrap
+        align="center"
         style={{
-          height: "40px",
-          width: "30%",
-          padding: 20,
-          display: "flex",
-          justifyContent: "center",
-          margin: "10px auto",
-          textAlign: "center",
-          borderRadius: "10px",
-          background: "white",
+          fontSize: "45px",
+          fontFamily: "cursive",
+          letterSpacing: ".1rem",
+          fontWeight: 900,
+          color: "#527853",
+          textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+          fontWeight: "bold",
+          paddingTop: "100px",
         }}
       >
-        <Typography variant="h4" fontFamily="Work sans" fontSize="2.25rem">
-          APPLICATION
-        </Typography>
-      </Paper> */}
-      <Box
-        sx={{
-          position: "relative",
-          marginTop: "5%",
-          // transform: "translate(-50%, -50%)",
-          width: "80%",
-          maxWidth: "400px",
-          height: "auto",
-          zIndex: 1,
-          height: "3em",
-        }}
-      >
-        {/* <Paper elevation={3} style={paperStyle}> */}
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          variant="fullWidth"
-          centered
+        Result X
+      </Typography>
+      <Stack alignItems="center" maxW="md">
+        <Box
+          sx={{
+            bgcolor: "background.paper",
+            width: 500,
+            borderRadius: "5px",
+            position: "relative",
+            marginTop: "1%",
+            width: "80%",
+            maxWidth: "400px",
+            height: "auto",
+            zIndex: 1,
+            height: "3em",
+          }}
         >
-          <Tab label="Student" />
-          <Tab label="Admin" />
-        </Tabs>
-        <TabPanel value={value} index={0} dir={theme.direction}>
-          <StudentLogin />
-        </TabPanel>
-        <TabPanel value={value} index={1} dir={theme.direction}>
-          <AdminLogin />
-        </TabPanel>
-        {/* </Paper> */}
-      </Box>
-    </Stack>
+          <AppBar
+            position="static"
+            sx={{
+              bgcolor: "#75A47F",
+              marginBottom: "10px",
+              borderRadius: "5px",
+              height: "60px",
+              border: "1px solid #4F6F52",
+            }}
+          >
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              indicatorColor="secondary"
+              height="60px"
+              textColor="inherit"
+              variant="fullWidth"
+              aria-label="full width tabs example"
+            >
+              <Tab label="Student" {...a11yProps(0)} />
+              <Tab label="Admin" {...a11yProps(1)} />
+            </Tabs>
+          </AppBar>
+          <Stack
+            sx={{
+              border: "1px solid #BACD92",
+              borderRadius: "9px",
+              bgcolor: "#FEFDED",
+            }}
+          >
+            <SwipeableViews
+              axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+              index={value}
+              onChangeIndex={handleChangeIndex}
+            >
+              <TabPanel value={value} index={0} dir={theme.direction}>
+                <StudentLogin />
+              </TabPanel>
+              <TabPanel value={value} index={1} dir={theme.direction}>
+                <AdminLogin />
+              </TabPanel>
+            </SwipeableViews>
+          </Stack>
+        </Box>
+      </Stack>
+    </div>
   );
-};
+}
 
-export default HomePage;
+function a11yProps(index) {
+  return {
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
+  };
+}

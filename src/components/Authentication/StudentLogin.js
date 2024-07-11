@@ -11,13 +11,14 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Link, NavLink } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Bounce } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import BackendEndpoints from "../../utils/BackendEndpoints";
+import Cookies from "js-cookie";
 
 const StudentLogin = () => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   let navigate = useNavigate();
@@ -26,77 +27,70 @@ const StudentLogin = () => {
     setShow(!show);
   };
 
-  const commonToastOptions = {
-    position: "bottom-left",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: false,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
-    transition: Bounce,
-  };
+  // setting up the tokens
+  const [tokens, setTokens] = useState({
+    accessToken: Cookies.get(BackendEndpoints.AUTH_STUDENT_ACCESS_TOKEN),
+    refreshToken: Cookies.get(BackendEndpoints.AUTH_STUDENT_REFRESH_TOKEN),
+  });
 
   const submitHandler = async () => {
     setLoading(true);
     if (!email || !password) {
-      toast.warn("Please fill all the fields!", {
-        ...commonToastOptions,
-      });
+      toast.warn("Please fill all the fields!");
       setLoading(false);
       return;
     }
-    if (!email.endsWith("@gmail.com")) {
-      toast.error("Please enter a valid Gmail address", {
-        ...commonToastOptions,
-      });
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailPattern.test(email)) {
+      toast.error("Please enter a valid email address");
+      setLoading(false);
       return;
     }
     try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-
       const { data } = await axios.post(
-        "/api/v1/auth/student/login",
-        { email, password },
-        config
+        BackendEndpoints.REACT_APP_STUDENT_LOGIN_API,
+        { email, account_password: password }
       );
-      // Extract the tokens from the response data
-      const { loginAuthToken, refreshAuthToken } = data;
 
-      // Set the tokens in cookies
-      document.cookie = `loginAuthToken=${loginAuthToken}; path=/`;
-      document.cookie = `refreshAuthToken=${refreshAuthToken}; path=/`;
-      navigate("/aboutpage");
-      toast.warn("Login Successfull!", {
-        ...commonToastOptions,
-      });
-      setLoading(false);
-      // navigate("/xyz");
+      if (data.status === 200) {
+        // Set user information and tokens in cookies
+        console.log(data);
+        Cookies.set("studentInfo", JSON.stringify(data.user));
+        Cookies.set(
+          BackendEndpoints.AUTH_STUDENT_ACCESS_TOKEN,
+          data.loginAuthToken
+        );
+        Cookies.set(
+          BackendEndpoints.AUTH_STUDENT_REFRESH_TOKEN,
+          data.refreshAuthToken
+        );
+
+        toast.success("Login Successful!");
+        setLoading(false);
+        navigate(`/student/${data.user.enrollment_id}`);
+      } else {
+        toast.error(data.message);
+        setEmail("");
+        setPassword("");
+        setLoading(false);
+      }
     } catch (error) {
-      toast.error("Error Occured!", {
-        ...commonToastOptions,
-      });
+      toast.error("Error Occurred!");
       setLoading(false);
+      navigate("/");
     }
   };
 
   return (
-    <Stack>
+    <Stack spacing={2}>
       <TextField
         id="standard-basic"
         label="Email"
         variant="standard"
         placeholder="Enter Your Email"
         value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-        }}
-        style={{ marginTop: 15 }}
+        onChange={(e) => setEmail(e.target.value)}
         fullWidth
         required
       />
@@ -108,10 +102,7 @@ const StudentLogin = () => {
         placeholder="Enter password"
         type={show ? "text" : "password"}
         value={password}
-        style={{ marginTop: 15 }}
-        onChange={(e) => {
-          setPassword(e.target.value);
-        }}
+        onChange={(e) => setPassword(e.target.value)}
         fullWidth
         required
         InputProps={{
@@ -153,7 +144,18 @@ const StudentLogin = () => {
           Signup
         </NavLink>
       </p>
-      <ToastContainer />
+
+      {/* <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      /> */}
     </Stack>
   );
 };

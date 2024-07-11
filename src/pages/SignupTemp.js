@@ -6,28 +6,23 @@ import { Route, Routes } from "react-router-dom";
 
 const SignupTemp = () => {
   const paperStyle = {
-    padding: 20,
-    height: "85vh",
-    width: "28%",
-    margin: "60px auto",
-    borderWidth: "2px",
-    // border: "1px solid black",
-    borderRadius: "10px",
+    minHeight: "100vh",
+    width: "100vw",
+    backgroundColor: "#d4e7c5",
   };
 
   return (
-    <Stack alignItems="center">
+    <Stack alignItems="center" style={paperStyle}>
       <Box
         sx={{
           position: "relative",
           marginTop: "2%",
-          // transform: "translate(-50%, -50%)",
-          width: "80%",
-          maxWidth: "400px",
+          width: "100%",
+          maxWidth: "500px",
           zIndex: 1,
           height: "auto",
-          backgroundColor: "white",
-          padding: 3,
+          backgroundColor: "#FEFDED",
+          padding: 4,
           borderRadius: "10px",
         }}
       >

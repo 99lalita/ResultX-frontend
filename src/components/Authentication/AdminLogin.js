@@ -1,78 +1,83 @@
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import React, { useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Link, NavLink } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Bounce } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Cookies from "js-cookie";
+import BackendEndpoints from "../../utils/BackendEndpoints";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+
   let navigate = useNavigate();
 
   const handleClick = () => {
     setShow(!show);
   };
-  const commonToastOptions = {
-    position: "bottom-left",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: false,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
-    transition: Bounce,
-  };
+
   const submitHandler = async () => {
     setLoading(true);
     if (!email || !password) {
-      toast.warn("Please fill all the fields!", {
-        ...commonToastOptions,
-      });
+      toast.warn("Please fill all the fields!");
       setLoading(false);
       return;
     }
-    if (!email.endsWith("@gmail.com")) {
-      toast.error("Please enter a valid Gmail address", {
-        ...commonToastOptions,
-      });
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailPattern.test(email)) {
+      toast.error("Please enter a valid email address");
+      setLoading(false);
       return;
     }
+
     try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-
       const { data } = await axios.post(
-        "/api/v1/auth/admin/login",
-        { email, password },
-        config
+        BackendEndpoints.REACT_APP_ADMIN_LOGIN_API,
+        {
+          email,
+          account_password: password,
+        }
       );
-      // Extract the tokens from the response data
-      const { loginAuthToken, refreshAuthToken } = data;
 
-      // Set the tokens in cookies
-      document.cookie = `loginAuthToken=${loginAuthToken}; path=/`;
-      document.cookie = `refreshAuthToken=${refreshAuthToken}; path=/`;
-      navigate("/aboutpage");
-      toast.success("Login Successfull!", {
-        ...commonToastOptions,
-      });
-      setLoading(false);
+      if (data.status === 200) {
+        // Set user information and tokens in cookies
+        console.log(data);
+        Cookies.set("adminInfo", JSON.stringify(data.result));
+        Cookies.set(
+          BackendEndpoints.AUTH_ADMIN_ACCESS_TOKEN,
+          data.loginAuthToken
+        );
+        Cookies.set(
+          BackendEndpoints.AUTH_ADMIN_REFRESH_TOKEN,
+          data.refreshAuthToken
+        );
+
+        toast.success("Login Successful!");
+        setLoading(false);
+        navigate(`/admin/${data.result.admin_id}`);
+      } else {
+        toast.error(data.message);
+        setEmail("");
+        setPassword("");
+        setLoading(false);
+      }
     } catch (error) {
-      toast.error("Error Occured!", {
-        ...commonToastOptions,
-      });
+      toast.error("Error Occurred!");
       setLoading(false);
+      navigate("/");
     }
   };
 
@@ -80,9 +85,9 @@ const AdminLogin = () => {
     <Stack>
       <TextField
         id="standard-basic"
-        label="Email"
         variant="standard"
-        placeholder="Enter Your Email"
+        label="Email"
+        placeholder={"Enter Your Email"}
         value={email}
         onChange={(e) => {
           setEmail(e.target.value);
@@ -95,10 +100,10 @@ const AdminLogin = () => {
         id="standard-basic"
         variant="standard"
         label="Password"
-        placeholder="Enter password"
+        placeholder={"Enter password"}
         type={show ? "text" : "password"}
         value={password}
-        style={{ marginTop: 15 }}
+        style={{ marginTop: 20 }}
         onChange={(e) => {
           setPassword(e.target.value);
         }}
@@ -127,23 +132,11 @@ const AdminLogin = () => {
         variant="contained"
         width="100%"
         onClick={submitHandler}
-        style={{ marginTop: "25px" }}
+        style={{ marginTop: "15px", marginBottom: "10px" }}
       >
-        Login
+        {loading ? <CircularProgress /> : "Login"}
       </Button>
 
-      <Button
-        variant="contained"
-        width="100%"
-        isLoading={loading}
-        onClick={() => {
-          setEmail("guest@example.com");
-          setPassword("123456");
-        }}
-        style={{ marginTop: 5, backgroundColor: "#D24545" }}
-      >
-        Get Guest User Credentials
-      </Button>
       <Typography>
         <Link href="#" style={{ textDecoration: "none" }}>
           Forgot password ?
@@ -156,7 +149,6 @@ const AdminLogin = () => {
           Signup
         </NavLink>
       </p>
-      <ToastContainer />
     </Stack>
   );
 };
