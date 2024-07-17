@@ -68,7 +68,7 @@ function ResultUploadForm({ year, onSubmit }) {
     graduation_year: "",
     CGPA: "",
     percentage: "",
-    resultStatus: "PASS",
+    resultStatus: "",
     marks_obtained: "",
   });
 
@@ -488,9 +488,11 @@ function ResultUploadForm({ year, onSubmit }) {
               }}
               variants={variants}
             >
-              <motion.option value="PASS">PASS</motion.option>
-              <motion.option value="FAIL">FAIL</motion.option>
-              <motion.option value="ATKT">ATKT</motion.option>
+              <option value="PASS">PASS</option>
+              <option value="FAIL">FAIL</option>
+              <option value="ATKT (1)">ATKT (1)</option>
+              <option value="ATKT (2)">ATKT (2)</option>
+              <option value="ATKT (3)">ATKT (3)</option>
             </motion.select>
           </motion.div>
           <motion.div className="result-form-div" variants={variants}>
