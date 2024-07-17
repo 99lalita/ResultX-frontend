@@ -16,23 +16,23 @@ import { useTheme } from "../../context/ThemeContext";
 import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
 import { useTypingEffect } from "../../hooks/typing-effect";
-import { makeStyles } from "@mui/styles";
+// import { makeStyles } from "@mui/styles";
 import BackendEndpoints from "../../utils/BackendEndpoints";
 import { useNavigate } from "react-router-dom";
 
-const useStyles = makeStyles((theme) => ({
-  disabledAccordion: {
-    backgroundColor: "#F1F1F1",
-    color: "black",
-    "& .MuiAccordionSummary-root": {
-      backgroundColor: "#F1F1F1",
-    },
-  },
-}));
+// const useStyles = makeStyles((theme) => ({
+//   disabledAccordion: {
+//     backgroundColor: "#F1F1F1",
+//     color: "black",
+//     "& .MuiAccordionSummary-root": {
+//       backgroundColor: "#F1F1F1",
+//     },
+//   },
+// }));
 const StudentPanel = () => {
   const { theme, student } = useTheme();
   const navigate = useNavigate();
-  const classes = useStyles();
+  // const classes = useStyles();
 
   const [firstYearResult, setFirstYearResult] = useState(null);
   const [secondYearResult, setSecondYearResult] = useState(null);
@@ -221,7 +221,7 @@ const StudentPanel = () => {
         <Tooltip title="You are not supposed to Upload Result for First Year">
           <Accordion
             disabled
-            className={classes.disabledAccordion}
+            // className={classes.disabledAccordion}
             sx={{
               width: "100%",
             }}
@@ -253,7 +253,7 @@ const StudentPanel = () => {
       ) : (
         <Accordion
           disabled={isFutureYear(1)}
-          className={isFutureYear(1) ? classes.disabledAccordion : ""}
+          // className={isFutureYear(1) ? classes.disabledAccordion : ""}
           sx={{
             marginTop: "50px",
             width: "100%",
@@ -343,7 +343,7 @@ const StudentPanel = () => {
       {/* second Year Accordian */}
       <Accordion
         disabled={isFutureYear(2)}
-        className={isFutureYear(2) ? classes.disabledAccordion : ""}
+        // className={isFutureYear(2) ? classes.disabledAccordion : ""}
         sx={{
           marginTop: "10px",
           width: "100%",
@@ -430,7 +430,7 @@ const StudentPanel = () => {
       {/* third Year Accordian */}
       <Accordion
         disabled={isFutureYear(3)}
-        className={isFutureYear(3) ? classes.disabledAccordion : ""}
+        // className={isFutureYear(3) ? classes.disabledAccordion : ""}
         sx={{
           marginTop: "10px",
           width: "100%",
@@ -522,7 +522,7 @@ const StudentPanel = () => {
       >
         <Accordion
           disabled={isFutureYear(4)}
-          className={isFutureYear(4) ? classes.disabledAccordion : ""}
+          // className={isFutureYear(4) ? classes.disabledAccordion : ""}
           sx={{
             marginTop: "10px",
             width: "100%",
