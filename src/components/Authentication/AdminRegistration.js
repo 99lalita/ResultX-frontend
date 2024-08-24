@@ -19,6 +19,7 @@ import { Checkbox, FormControlLabel } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import BackendEndpoints from "../../utils/BackendEndpoints";
+import { AdminPRN } from "../../constants/AdminVerificationData";
 
 const AdminRegistration = () => {
   const [first_name, setFirstName] = useState();
@@ -84,6 +85,12 @@ const AdminRegistration = () => {
     }
   };
 
+  const verifyPRN = (prn) => {
+    console.log("Verifying PRN:", prn); // Log the PRN being verified
+    const exists = AdminPRN.some((admin) => admin.admin_id === prn);
+    console.log("PRN exists:", exists); // Log the result of the verification
+    return exists;
+  };
   const submitHandler = async () => {
     setLoading(true);
     if (
@@ -96,6 +103,13 @@ const AdminRegistration = () => {
       !profileImageURI
     ) {
       toast.warn("Please Fill all the Feilds", {
+        ...commonToastOptions,
+      });
+      setLoading(false);
+      return;
+    }
+    if (!verifyPRN(admin_id)) {
+      toast.warn("Invalid PRN Number", {
         ...commonToastOptions,
       });
       setLoading(false);

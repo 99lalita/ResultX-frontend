@@ -50,10 +50,7 @@ const StudentPanel = () => {
   const currentYear = student ? student.current_year : "";
 
   // Animation
-  const infoText = useTypingEffect(
-    `Welcome Back ${firstName} ${lastName}...`,
-    10
-  );
+  const infoText = `Welcome Back ${firstName} ${lastName}...`;
 
   let currentYearMapping =
     currentYear === 1
@@ -64,10 +61,7 @@ const StudentPanel = () => {
       ? "Third Year"
       : "Final Year";
   // Animation
-  const currentYearText = useTypingEffect(
-    `Current Year : ${currentYearMapping}`,
-    200
-  );
+  const currentYearText = `Current Year : ${currentYearMapping}`;
 
   // Function to check if a year is in the future based on current year of the student
   const isFutureYear = (year) => {

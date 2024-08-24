@@ -27,7 +27,6 @@ const StudentLogin = () => {
     setShow(!show);
   };
 
-
   const submitHandler = async () => {
     setLoading(true);
     if (!email || !password) {
@@ -93,8 +92,8 @@ const StudentLogin = () => {
       <TextField
         id="standard-basic"
         variant="standard"
-        label="Password"
-        placeholder="Enter password"
+        label="Moodle Password"
+        placeholder="Enter your moodle password"
         type={show ? "text" : "password"}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
@@ -127,11 +126,11 @@ const StudentLogin = () => {
       >
         {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
       </Button>
-      <Typography>
+      {/* <Typography>
         <Link href="#" style={{ textDecoration: "none" }}>
           Forgot password ?
         </Link>
-      </Typography>
+      </Typography> */}
 
       <p>
         Don't have an account?{" "}

@@ -22,7 +22,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import BackendEndpoints from "../../utils/BackendEndpoints";
-
+import { studentPRN } from "../../constants/StudentDataVerificarion";
 
 const StudentRegistration = () => {
   const [first_name, setFirstName] = useState();
@@ -120,6 +120,13 @@ const StudentRegistration = () => {
 
       return;
     }
+     if (!verifyPRN(enrollment_id)) {
+       toast.warn("Invalid PRN Number", {
+         ...commonToastOptions,
+       });
+       
+       return;
+     }
     if (account_password !== confirmpassword) {
       toast.warn("Passwords Do Not Match", {
         ...commonToastOptions,
@@ -190,6 +197,12 @@ const StudentRegistration = () => {
       navigate("/");
     }
   };
+   const verifyPRN = (prn) => {
+     console.log("Verifying PRN:", prn); 
+     const exists = studentPRN.some((student) => student.student_id === prn);
+     console.log("PRN exists:", exists); 
+     return exists;
+   };
 
   function generateYearOptions() {
     const current_year = new Date().getFullYear();
@@ -276,8 +289,8 @@ const StudentRegistration = () => {
         <TextField
           id="standard-basic"
           variant="standard"
-          label="Password"
-          placeholder="Enter password"
+          label="Moodle Password"
+          placeholder="Enter your Moodle password"
           type={show ? "text" : "password"}
           value={account_password}
           style={{ marginTop: 15 }}

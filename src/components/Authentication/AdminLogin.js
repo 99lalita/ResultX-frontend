@@ -82,7 +82,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <Stack>
+    <Stack spacing={2}>
       <TextField
         id="standard-basic"
         variant="standard"
@@ -132,16 +132,16 @@ const AdminLogin = () => {
         variant="contained"
         width="100%"
         onClick={submitHandler}
-        style={{ marginTop: "15px", marginBottom: "10px" }}
+        style={{ marginTop: "15px" }}
       >
         {loading ? <CircularProgress /> : "Login"}
       </Button>
 
-      <Typography>
+      {/* <Typography>
         <Link href="#" style={{ textDecoration: "none" }}>
           Forgot password ?
         </Link>
-      </Typography>
+      </Typography> */}
 
       <p>
         Don't have an account?{" "}
